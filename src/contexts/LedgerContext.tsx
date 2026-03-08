@@ -60,6 +60,14 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
     setData(prev => ({ ...prev, jomaList: [{ ...j, id: generateId() }, ...prev.jomaList] }));
   }, []);
 
+  const editBaki = useCallback((id: string, updates: Partial<Omit<BakiEntry, 'id'>>) => {
+    setData(prev => ({ ...prev, bakiList: prev.bakiList.map(b => b.id === id ? { ...b, ...updates } : b) }));
+  }, []);
+
+  const editJoma = useCallback((id: string, updates: Partial<Omit<JomaEntry, 'id'>>) => {
+    setData(prev => ({ ...prev, jomaList: prev.jomaList.map(j => j.id === id ? { ...j, ...updates } : j) }));
+  }, []);
+
   const deleteBaki = useCallback((id: string) => {
     setData(prev => ({ ...prev, bakiList: prev.bakiList.filter(b => b.id !== id) }));
   }, []);
