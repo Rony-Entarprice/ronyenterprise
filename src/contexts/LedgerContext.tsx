@@ -15,6 +15,9 @@ interface LedgerContextType {
   deleteJoma: (id: string) => void;
   updateAccountBalance: (id: string, amount: number) => void;
   setBusinessName: (name: string) => void;
+  addAccount: (a: Omit<Account, 'id'>) => void;
+  editAccount: (id: string, updates: Partial<Omit<Account, 'id'>>) => void;
+  deleteAccount: (id: string) => void;
 }
 
 const LedgerContext = createContext<LedgerContextType | null>(null);
