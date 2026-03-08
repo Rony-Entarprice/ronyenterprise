@@ -6,12 +6,16 @@ export interface Account {
   icon: string;
 }
 
+export type BakiStatus = 'unpaid' | 'paid';
+export type JomaStatus = 'pending' | 'returned';
+
 export interface BakiEntry {
   id: string;
   name: string;
   amount: number;
   date: string;
   note: string;
+  status: BakiStatus;
 }
 
 export interface JomaEntry {
@@ -20,6 +24,7 @@ export interface JomaEntry {
   amount: number;
   date: string;
   note: string;
+  status: JomaStatus;
 }
 
 export type TransactionType = 'income' | 'expense' | 'baki' | 'joma' | 'transfer';

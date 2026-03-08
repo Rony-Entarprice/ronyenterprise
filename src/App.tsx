@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import AccountsPage from "./pages/AccountsPage";
 import BakiPage from "./pages/BakiPage";
 import TransactionsPage from "./pages/TransactionsPage";
+import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
@@ -28,6 +29,7 @@ const App = () => (
               <Route path="/accounts" element={<AccountsPage />} />
               <Route path="/baki" element={<BakiPage />} />
               <Route path="/transactions" element={<TransactionsPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

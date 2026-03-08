@@ -17,17 +17,17 @@ export const defaultData: BusinessData = {
     { id: 'cash', name: 'Cash Balance', category: 'Cash', balance: 55000, icon: 'Banknote' },
   ],
   bakiList: [
-    { id: 'b1', name: 'Jemi', amount: 3019, date: '2026-03-01', note: '' },
-    { id: 'b2', name: 'Salma Kaki', amount: 3518, date: '2026-03-02', note: '' },
-    { id: 'b3', name: 'Bakul Kaka', amount: 13000, date: '2026-02-15', note: '' },
-    { id: 'b4', name: 'Laki Kaka', amount: 15500, date: '2026-02-20', note: '' },
-    { id: 'b5', name: 'Tuhin Vai', amount: 12000, date: '2026-02-28', note: '' },
-    { id: 'b6', name: 'Baki TK', amount: 19342, date: '2026-03-05', note: '' },
+    { id: 'b1', name: 'Jemi', amount: 3019, date: '2026-03-01', note: '', status: 'unpaid' },
+    { id: 'b2', name: 'Salma Kaki', amount: 3518, date: '2026-03-02', note: '', status: 'unpaid' },
+    { id: 'b3', name: 'Bakul Kaka', amount: 13000, date: '2026-02-15', note: '', status: 'unpaid' },
+    { id: 'b4', name: 'Laki Kaka', amount: 15500, date: '2026-02-20', note: '', status: 'unpaid' },
+    { id: 'b5', name: 'Tuhin Vai', amount: 12000, date: '2026-02-28', note: '', status: 'unpaid' },
+    { id: 'b6', name: 'Baki TK', amount: 19342, date: '2026-03-05', note: '', status: 'unpaid' },
   ],
   jomaList: [
-    { id: 'j1', name: 'Shohab Kaka', amount: 4700, date: '2026-03-01', note: '' },
-    { id: 'j2', name: 'Bill Joma', amount: 1550, date: '2026-03-03', note: '' },
-    { id: 'j3', name: 'Bill Joma', amount: 1786, date: '2026-03-05', note: '' },
+    { id: 'j1', name: 'Shohab Kaka', amount: 4700, date: '2026-03-01', note: '', status: 'pending' },
+    { id: 'j2', name: 'Bill Joma', amount: 1550, date: '2026-03-03', note: '', status: 'pending' },
+    { id: 'j3', name: 'Bill Joma', amount: 1786, date: '2026-03-05', note: '', status: 'pending' },
   ],
   transactions: [
     { id: 't1', type: 'income', accountId: 'bkash-agent', name: 'Daily Sales', amount: 15000, date: '2026-03-07', note: 'Shop sales' },
@@ -41,7 +41,17 @@ export const defaultData: BusinessData = {
 export function loadData(): BusinessData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // Migrate old data without status fields
+      if (parsed.bakiList) {
+        parsed.bakiList = parsed.bakiList.map((b: any) => ({ ...b, status: b.status || 'unpaid' }));
+      }
+      if (parsed.jomaList) {
+        parsed.jomaList = parsed.jomaList.map((j: any) => ({ ...j, status: j.status || 'pending' }));
+      }
+      return parsed;
+    }
   } catch {}
   return defaultData;
 }

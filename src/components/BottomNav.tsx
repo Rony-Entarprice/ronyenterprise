@@ -1,12 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Wallet, Users, ArrowLeftRight, Settings } from 'lucide-react';
+import { LayoutDashboard, Wallet, Users, ArrowLeftRight, BarChart3, Settings } from 'lucide-react';
 
 const tabs = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/', label: 'Home', icon: LayoutDashboard },
   { path: '/accounts', label: 'Accounts', icon: Wallet },
   { path: '/baki', label: 'Baki', icon: Users },
   { path: '/transactions', label: 'History', icon: ArrowLeftRight },
-  { path: '/settings', label: 'Settings', icon: Settings },
+  { path: '/reports', label: 'Reports', icon: BarChart3 },
 ];
 
 export default function BottomNav() {
