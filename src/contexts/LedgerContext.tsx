@@ -105,7 +105,7 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
   return (
     <LedgerContext.Provider value={{
       data, totalBalance, totalBaki, totalJoma, totalAccountBalance,
-      addTransaction, addBaki, addJoma, deleteBaki, deleteJoma,
+      addTransaction, addBaki, addJoma, editBaki, editJoma, deleteBaki, deleteJoma,
       updateAccountBalance, setBusinessName, addAccount, editAccount, deleteAccount,
     }}>
       {children}

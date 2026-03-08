@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLedger } from '@/contexts/LedgerContext';
 import PageHeader from '@/components/PageHeader';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -9,21 +9,49 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 function formatTaka(n: number) { return '৳' + n.toLocaleString('en-BD'); }
 
 export default function BakiPage() {
-  const { data, totalBaki, totalJoma, addBaki, addJoma, deleteBaki, deleteJoma } = useLedger();
+  const { data, totalBaki, totalJoma, addBaki, addJoma, editBaki, editJoma, deleteBaki, deleteJoma } = useLedger();
   const [tab, setTab] = useState<'baki' | 'joma'>('baki');
   const [showAdd, setShowAdd] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [note, setNote] = useState('');
 
-  const handleAdd = () => {
+  const resetForm = () => {
+    setName(''); setAmount(''); setNote('');
+    setDate(new Date().toISOString().split('T')[0]);
+    setEditingId(null);
+  };
+
+  const openAdd = () => {
+    resetForm();
+    setShowAdd(true);
+  };
+
+  const openEdit = (item: { id: string; name: string; amount: number; date: string; note: string }) => {
+    setEditingId(item.id);
+    setName(item.name);
+    setAmount(String(item.amount));
+    setDate(item.date);
+    setNote(item.note);
+    setShowAdd(true);
+  };
+
+  const handleSave = () => {
     const amt = parseFloat(amount);
     if (!name.trim() || isNaN(amt) || amt <= 0) return;
-    if (tab === 'baki') addBaki({ name: name.trim(), amount: amt, date, note: note.trim() });
-    else addJoma({ name: name.trim(), amount: amt, date, note: note.trim() });
+    const entry = { name: name.trim(), amount: amt, date, note: note.trim() };
+
+    if (editingId) {
+      if (tab === 'baki') editBaki(editingId, entry);
+      else editJoma(editingId, entry);
+    } else {
+      if (tab === 'baki') addBaki(entry);
+      else addJoma(entry);
+    }
     setShowAdd(false);
-    setName(''); setAmount(''); setNote('');
+    resetForm();
   };
 
   const list = tab === 'baki' ? data.bakiList : data.jomaList;
@@ -62,7 +90,7 @@ export default function BakiPage() {
 
       {/* Add Button */}
       <div className="mx-4 mb-3">
-        <Button onClick={() => setShowAdd(true)} variant="outline" className="w-full gap-2">
+        <Button onClick={openAdd} variant="outline" className="w-full gap-2">
           <Plus className="w-4 h-4" /> Add {tab === 'baki' ? 'Baki' : 'Joma'}
         </Button>
       </div>
@@ -78,7 +106,13 @@ export default function BakiPage() {
               <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
               <p className="text-[10px] text-muted-foreground">{item.date}{item.note ? ` • ${item.note}` : ''}</p>
             </div>
-            <p className="text-sm font-bold text-foreground mr-2">{formatTaka(item.amount)}</p>
+            <p className="text-sm font-bold text-foreground mr-1">{formatTaka(item.amount)}</p>
+            <button
+              onClick={() => openEdit(item)}
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
             <button
               onClick={() => tab === 'baki' ? deleteBaki(item.id) : deleteJoma(item.id)}
               className="text-muted-foreground hover:text-destructive transition-colors"
@@ -89,18 +123,20 @@ export default function BakiPage() {
         ))}
       </div>
 
-      {/* Add Dialog */}
-      <Dialog open={showAdd} onOpenChange={setShowAdd}>
+      {/* Add/Edit Dialog */}
+      <Dialog open={showAdd} onOpenChange={(open) => { setShowAdd(open); if (!open) resetForm(); }}>
         <DialogContent className="max-w-sm mx-auto">
           <DialogHeader>
-            <DialogTitle>Add {tab === 'baki' ? 'Baki Pabo' : 'Joma'}</DialogTitle>
+            <DialogTitle>{editingId ? 'Edit' : 'Add'} {tab === 'baki' ? 'Baki Pabo' : 'Joma'}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-3">
             <Input placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
             <Input placeholder="Amount (৳)" type="number" value={amount} onChange={e => setAmount(e.target.value)} />
             <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
             <Input placeholder="Note (optional)" value={note} onChange={e => setNote(e.target.value)} />
-            <Button onClick={handleAdd} className="gradient-primary text-primary-foreground border-0">Save</Button>
+            <Button onClick={handleSave} className="gradient-primary text-primary-foreground border-0">
+              {editingId ? 'Update' : 'Save'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
