@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLedger } from '@/contexts/LedgerContext';
 import { TransactionType } from '@/types/ledger';
-import { Plus, X, ArrowDownLeft, ArrowUpRight, Users, HandCoins, ArrowLeftRight } from 'lucide-react';
+import { Plus, ArrowDownLeft, ArrowUpRight, Users, HandCoins, ArrowLeftRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ const txTypes = [
   { value: 'income' as TransactionType, label: 'Income', icon: ArrowDownLeft, color: 'text-success' },
   { value: 'expense' as TransactionType, label: 'Expense', icon: ArrowUpRight, color: 'text-destructive' },
   { value: 'baki' as TransactionType, label: 'Baki Pabo', icon: Users, color: 'text-primary' },
-  { value: 'joma' as TransactionType, label: 'Joma', icon: HandCoins, color: 'text-warning' },
+  { value: 'joma' as TransactionType, label: 'Joma Debo', icon: HandCoins, color: 'text-warning' },
   { value: 'transfer' as TransactionType, label: 'Transfer', icon: ArrowLeftRight, color: 'text-muted-foreground' },
 ];
 
@@ -47,9 +47,9 @@ export default function AddTransactionFAB() {
     if (!name.trim() || isNaN(amt) || amt <= 0) return;
 
     if (selectedType === 'baki') {
-      addBaki({ name: name.trim(), amount: amt, date, note: note.trim() });
+      addBaki({ name: name.trim(), amount: amt, date, note: note.trim(), status: 'unpaid' });
     } else if (selectedType === 'joma') {
-      addJoma({ name: name.trim(), amount: amt, date, note: note.trim() });
+      addJoma({ name: name.trim(), amount: amt, date, note: note.trim(), status: 'pending' });
     } else {
       addTransaction({
         type: selectedType,

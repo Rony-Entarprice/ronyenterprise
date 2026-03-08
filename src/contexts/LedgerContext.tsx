@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { BusinessData, Account, BakiEntry, JomaEntry, Transaction, TransactionType } from '@/types/ledger';
+import { BusinessData, Account, BakiEntry, JomaEntry, Transaction, BakiStatus, JomaStatus } from '@/types/ledger';
 import { loadData, saveData, generateId } from '@/lib/data';
 
 interface LedgerContextType {
@@ -8,6 +8,8 @@ interface LedgerContextType {
   totalBaki: number;
   totalJoma: number;
   totalAccountBalance: number;
+  totalIncome: number;
+  totalExpense: number;
   addTransaction: (t: Omit<Transaction, 'id'>) => void;
   addBaki: (b: Omit<BakiEntry, 'id'>) => void;
   addJoma: (j: Omit<JomaEntry, 'id'>) => void;
@@ -15,6 +17,8 @@ interface LedgerContextType {
   editJoma: (id: string, updates: Partial<Omit<JomaEntry, 'id'>>) => void;
   deleteBaki: (id: string) => void;
   deleteJoma: (id: string) => void;
+  toggleBakiStatus: (id: string) => void;
+  toggleJomaStatus: (id: string) => void;
   updateAccountBalance: (id: string, amount: number) => void;
   setBusinessName: (name: string) => void;
   addAccount: (a: Omit<Account, 'id'>) => void;
@@ -30,9 +34,11 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => { saveData(data); }, [data]);
 
   const totalAccountBalance = data.accounts.reduce((s, a) => s + a.balance, 0);
-  const totalBaki = data.bakiList.reduce((s, b) => s + b.amount, 0);
-  const totalJoma = data.jomaList.reduce((s, j) => s + j.amount, 0);
+  const totalBaki = data.bakiList.filter(b => b.status === 'unpaid').reduce((s, b) => s + b.amount, 0);
+  const totalJoma = data.jomaList.filter(j => j.status === 'pending').reduce((s, j) => s + j.amount, 0);
   const totalBalance = totalAccountBalance + totalBaki - totalJoma;
+  const totalIncome = data.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const totalExpense = data.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
 
   const addTransaction = useCallback((t: Omit<Transaction, 'id'>) => {
     setData(prev => {
@@ -76,6 +82,20 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
     setData(prev => ({ ...prev, jomaList: prev.jomaList.filter(j => j.id !== id) }));
   }, []);
 
+  const toggleBakiStatus = useCallback((id: string) => {
+    setData(prev => ({
+      ...prev,
+      bakiList: prev.bakiList.map(b => b.id === id ? { ...b, status: b.status === 'unpaid' ? 'paid' : 'unpaid' as BakiStatus } : b),
+    }));
+  }, []);
+
+  const toggleJomaStatus = useCallback((id: string) => {
+    setData(prev => ({
+      ...prev,
+      jomaList: prev.jomaList.map(j => j.id === id ? { ...j, status: j.status === 'pending' ? 'returned' : 'pending' as JomaStatus } : j),
+    }));
+  }, []);
+
   const updateAccountBalance = useCallback((id: string, amount: number) => {
     setData(prev => ({
       ...prev,
@@ -104,8 +124,9 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <LedgerContext.Provider value={{
-      data, totalBalance, totalBaki, totalJoma, totalAccountBalance,
+      data, totalBalance, totalBaki, totalJoma, totalAccountBalance, totalIncome, totalExpense,
       addTransaction, addBaki, addJoma, editBaki, editJoma, deleteBaki, deleteJoma,
+      toggleBakiStatus, toggleJomaStatus,
       updateAccountBalance, setBusinessName, addAccount, editAccount, deleteAccount,
     }}>
       {children}
