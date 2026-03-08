@@ -8,11 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const txTypes = [
-  { value: 'income' as TransactionType, label: 'Income', icon: ArrowDownLeft, color: 'text-success' },
-  { value: 'expense' as TransactionType, label: 'Expense', icon: ArrowUpRight, color: 'text-destructive' },
-  { value: 'baki' as TransactionType, label: 'Baki Pabo', icon: Users, color: 'text-primary' },
-  { value: 'joma' as TransactionType, label: 'Joma Debo', icon: HandCoins, color: 'text-warning' },
-  { value: 'transfer' as TransactionType, label: 'Transfer', icon: ArrowLeftRight, color: 'text-muted-foreground' },
+  { value: 'income' as TransactionType, label: 'Income', icon: ArrowDownLeft, color: 'text-success', bg: 'bg-success/10' },
+  { value: 'expense' as TransactionType, label: 'Expense', icon: ArrowUpRight, color: 'text-destructive', bg: 'bg-destructive/10' },
+  { value: 'baki' as TransactionType, label: 'Baki Pabo', icon: Users, color: 'text-primary', bg: 'bg-primary/10' },
+  { value: 'joma' as TransactionType, label: 'Joma Debo', icon: HandCoins, color: 'text-warning', bg: 'bg-warning/10' },
+  { value: 'transfer' as TransactionType, label: 'Transfer', icon: ArrowLeftRight, color: 'text-muted-foreground', bg: 'bg-muted' },
 ];
 
 export default function AddTransactionFAB() {
@@ -36,105 +36,74 @@ export default function AddTransactionFAB() {
   };
 
   const openForm = (type: TransactionType) => {
-    setSelectedType(type);
-    setShowMenu(false);
-    setShowForm(true);
-    reset();
+    setSelectedType(type); setShowMenu(false); setShowForm(true); reset();
   };
 
   const handleSubmit = () => {
     const amt = parseFloat(amount);
     if (!name.trim() || isNaN(amt) || amt <= 0) return;
-
     if (selectedType === 'baki') {
       addBaki({ name: name.trim(), amount: amt, date, note: note.trim(), status: 'unpaid' });
     } else if (selectedType === 'joma') {
       addJoma({ name: name.trim(), amount: amt, date, note: note.trim(), status: 'pending' });
     } else {
-      addTransaction({
-        type: selectedType,
-        accountId,
-        toAccountId: selectedType === 'transfer' ? toAccountId : undefined,
-        name: name.trim(),
-        amount: amt,
-        date,
-        note: note.trim(),
-      });
+      addTransaction({ type: selectedType, accountId, toAccountId: selectedType === 'transfer' ? toAccountId : undefined, name: name.trim(), amount: amt, date, note: note.trim() });
     }
-    setShowForm(false);
-    reset();
+    setShowForm(false); reset();
   };
 
   return (
     <>
       <button
         onClick={() => setShowMenu(true)}
-        className="fixed bottom-20 right-4 z-40 w-14 h-14 rounded-full gradient-primary text-primary-foreground shadow-lg flex items-center justify-center active:scale-95 transition-transform"
+        className="fixed bottom-24 right-5 z-40 w-14 h-14 rounded-2xl gradient-primary text-white flex items-center justify-center active:scale-95 transition-transform"
+        style={{ boxShadow: '0 8px 24px -4px hsla(221, 83%, 53%, 0.4)' }}
       >
         <Plus className="w-7 h-7" />
       </button>
 
-      {/* Type Selection Menu */}
       <Dialog open={showMenu} onOpenChange={setShowMenu}>
-        <DialogContent className="max-w-sm mx-auto">
+        <DialogContent className="max-w-[90vw] rounded-3xl">
           <DialogHeader>
-            <DialogTitle>Add New Entry</DialogTitle>
+            <DialogTitle className="text-lg">New Entry</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-2">
+          <div className="grid gap-2 mt-1">
             {txTypes.map(t => (
-              <button
-                key={t.value}
-                onClick={() => openForm(t.value)}
-                className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted transition-colors text-left"
-              >
-                <div className={`w-10 h-10 rounded-full bg-muted flex items-center justify-center ${t.color}`}>
-                  <t.icon className="w-5 h-5" />
+              <button key={t.value} onClick={() => openForm(t.value)}
+                className="flex items-center gap-3 p-3.5 rounded-2xl hover:bg-muted/50 transition-colors text-left">
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${t.bg}`}>
+                  <t.icon className={`w-5 h-5 ${t.color}`} />
                 </div>
-                <span className="font-medium text-foreground">{t.label}</span>
+                <span className="font-semibold text-foreground">{t.label}</span>
               </button>
             ))}
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Transaction Form */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="max-w-sm mx-auto">
+        <DialogContent className="max-w-[90vw] rounded-3xl">
           <DialogHeader>
-            <DialogTitle>
-              Add {txTypes.find(t => t.value === selectedType)?.label}
-            </DialogTitle>
+            <DialogTitle className="text-lg">Add {txTypes.find(t => t.value === selectedType)?.label}</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-3">
-            <Input placeholder="Name / Description" value={name} onChange={e => setName(e.target.value)} />
-            <Input placeholder="Amount (৳)" type="number" value={amount} onChange={e => setAmount(e.target.value)} />
-            
+          <div className="grid gap-3 mt-2">
+            <Input placeholder="Name / Description" value={name} onChange={e => setName(e.target.value)} className="h-11 rounded-xl" />
+            <Input placeholder="Amount (৳)" type="number" value={amount} onChange={e => setAmount(e.target.value)} className="h-11 rounded-xl" />
             {selectedType !== 'baki' && selectedType !== 'joma' && (
               <Select value={accountId} onValueChange={setAccountId}>
-                <SelectTrigger><SelectValue placeholder="Select Account" /></SelectTrigger>
-                <SelectContent>
-                  {data.accounts.map(a => (
-                    <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
-                  ))}
-                </SelectContent>
+                <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Select Account" /></SelectTrigger>
+                <SelectContent>{data.accounts.map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
               </Select>
             )}
-
             {selectedType === 'transfer' && (
               <Select value={toAccountId} onValueChange={setToAccountId}>
-                <SelectTrigger><SelectValue placeholder="Transfer To" /></SelectTrigger>
-                <SelectContent>
-                  {data.accounts.filter(a => a.id !== accountId).map(a => (
-                    <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
-                  ))}
-                </SelectContent>
+                <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Transfer To" /></SelectTrigger>
+                <SelectContent>{data.accounts.filter(a => a.id !== accountId).map(a => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
               </Select>
             )}
-
-            <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
-            <Input placeholder="Note (optional)" value={note} onChange={e => setNote(e.target.value)} />
-            
-            <Button onClick={handleSubmit} className="w-full gradient-primary text-primary-foreground border-0">
+            <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="h-11 rounded-xl" />
+            <Input placeholder="Note (optional)" value={note} onChange={e => setNote(e.target.value)} className="h-11 rounded-xl" />
+            <Button onClick={handleSubmit} className="w-full h-12 rounded-xl gradient-primary text-white border-0 font-semibold text-base">
               Save
             </Button>
           </div>
