@@ -77,11 +77,26 @@ export function LedgerProvider({ children }: { children: React.ReactNode }) {
     setData(prev => ({ ...prev, businessName: name }));
   }, []);
 
+  const addAccount = useCallback((a: Omit<Account, 'id'>) => {
+    setData(prev => ({ ...prev, accounts: [...prev.accounts, { ...a, id: generateId() }] }));
+  }, []);
+
+  const editAccount = useCallback((id: string, updates: Partial<Omit<Account, 'id'>>) => {
+    setData(prev => ({
+      ...prev,
+      accounts: prev.accounts.map(a => a.id === id ? { ...a, ...updates } : a),
+    }));
+  }, []);
+
+  const deleteAccount = useCallback((id: string) => {
+    setData(prev => ({ ...prev, accounts: prev.accounts.filter(a => a.id !== id) }));
+  }, []);
+
   return (
     <LedgerContext.Provider value={{
       data, totalBalance, totalBaki, totalJoma, totalAccountBalance,
       addTransaction, addBaki, addJoma, deleteBaki, deleteJoma,
-      updateAccountBalance, setBusinessName,
+      updateAccountBalance, setBusinessName, addAccount, editAccount, deleteAccount,
     }}>
       {children}
     </LedgerContext.Provider>
