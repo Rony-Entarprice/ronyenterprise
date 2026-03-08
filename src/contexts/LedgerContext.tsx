@@ -11,6 +11,8 @@ interface LedgerContextType {
   addTransaction: (t: Omit<Transaction, 'id'>) => void;
   addBaki: (b: Omit<BakiEntry, 'id'>) => void;
   addJoma: (j: Omit<JomaEntry, 'id'>) => void;
+  editBaki: (id: string, updates: Partial<Omit<BakiEntry, 'id'>>) => void;
+  editJoma: (id: string, updates: Partial<Omit<JomaEntry, 'id'>>) => void;
   deleteBaki: (id: string) => void;
   deleteJoma: (id: string) => void;
   updateAccountBalance: (id: string, amount: number) => void;
