@@ -1,17 +1,27 @@
 import { useLedger } from '@/contexts/LedgerContext';
 import PageHeader from '@/components/PageHeader';
-import { TrendingUp, TrendingDown, Banknote, Landmark, Smartphone, Zap, Wallet as WalletIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown, Banknote, Landmark, Smartphone, Zap, Wallet as WalletIcon, ArrowDownLeft, ArrowUpRight, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const iconMap: Record<string, React.ElementType> = {
   Landmark, Smartphone, Zap, Wallet: WalletIcon, Banknote,
 };
 
-const categoryColors: Record<string, string> = {
+const categoryGradients: Record<string, string> = {
   DBBL: 'from-blue-500 to-blue-600',
-  bKash: 'from-pink-500 to-pink-600',
-  Rocket: 'from-purple-500 to-purple-600',
-  Nagad: 'from-orange-500 to-orange-600',
-  Cash: 'from-emerald-500 to-emerald-600',
+  bKash: 'from-pink-500 to-rose-600',
+  Rocket: 'from-violet-500 to-purple-600',
+  Nagad: 'from-orange-500 to-amber-600',
+  Cash: 'from-emerald-500 to-green-600',
+};
+
+const categoryBg: Record<string, string> = {
+  DBBL: 'bg-blue-500/10',
+  bKash: 'bg-pink-500/10',
+  Rocket: 'bg-violet-500/10',
+  Nagad: 'bg-orange-500/10',
+  Cash: 'bg-emerald-500/10',
 };
 
 function formatTaka(n: number) {
@@ -19,62 +29,134 @@ function formatTaka(n: number) {
 }
 
 export default function Dashboard() {
-  const { data, totalBalance, totalBaki, totalJoma, totalAccountBalance } = useLedger();
+  const { data, totalBalance, totalBaki, totalJoma, totalIncome, totalExpense } = useLedger();
+  const [showBalance, setShowBalance] = useState(true);
+
+  const recentTxs = data.transactions.slice(0, 4);
+  const cashBalance = data.accounts.find(a => a.id === 'cash')?.balance || 0;
 
   return (
-    <div className="pb-24">
-      <PageHeader title={data.businessName} />
+    <div className="pb-24 animate-fade-in">
+      <PageHeader title={data.businessName} showSettings />
 
-      {/* Total Balance Card */}
-      <div className="mx-4 mb-4 p-5 rounded-2xl gradient-primary text-primary-foreground">
-        <p className="text-sm opacity-80">Total Balance</p>
-        <p className="text-3xl font-bold mt-1">{formatTaka(totalBalance)}</p>
+      {/* Hero Balance Card */}
+      <div className="mx-4 mb-5">
+        <div className="gradient-card-blue rounded-3xl p-6 text-white relative overflow-hidden">
+          {/* Decorative circles */}
+          <div className="absolute -right-6 -top-6 w-28 h-28 rounded-full bg-white/10" />
+          <div className="absolute -right-2 top-12 w-16 h-16 rounded-full bg-white/5" />
+          <div className="absolute left-8 -bottom-4 w-20 h-20 rounded-full bg-white/5" />
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-sm font-medium text-white/70">Total Business Balance</p>
+              <button onClick={() => setShowBalance(!showBalance)} className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
+                {showBalance ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+              </button>
+            </div>
+            <p className="text-3xl font-extrabold tracking-tight mb-4">
+              {showBalance ? formatTaka(totalBalance) : '৳ • • • • •'}
+            </p>
+            <div className="flex gap-4">
+              <div className="flex items-center gap-1.5">
+                <div className="w-6 h-6 rounded-full bg-white/15 flex items-center justify-center">
+                  <ArrowDownLeft className="w-3 h-3" />
+                </div>
+                <div>
+                  <p className="text-[9px] text-white/60">Income</p>
+                  <p className="text-xs font-semibold">{formatTaka(totalIncome)}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="w-6 h-6 rounded-full bg-white/15 flex items-center justify-center">
+                  <ArrowUpRight className="w-3 h-3" />
+                </div>
+                <div>
+                  <p className="text-[9px] text-white/60">Expense</p>
+                  <p className="text-xs font-semibold">{formatTaka(totalExpense)}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-3 mx-4 mb-5">
-        <div className="p-3 rounded-xl bg-card border border-border">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-2">
-            <TrendingUp className="w-4 h-4 text-primary" />
+      {/* Quick Stats Row */}
+      <div className="grid grid-cols-3 gap-3 mx-4 mb-6">
+        <div className="glass-card-elevated p-3.5 rounded-2xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mb-2.5">
+            <TrendingUp className="w-4.5 h-4.5 text-primary" />
           </div>
-          <p className="text-[10px] text-muted-foreground">Total Pabo</p>
-          <p className="text-sm font-bold text-foreground">{formatTaka(totalBaki)}</p>
+          <p className="text-[10px] text-muted-foreground font-medium">Total Pabo</p>
+          <p className="text-sm font-bold text-foreground mt-0.5">{formatTaka(totalBaki)}</p>
         </div>
-        <div className="p-3 rounded-xl bg-card border border-border">
-          <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center mb-2">
-            <TrendingDown className="w-4 h-4 text-destructive" />
+        <div className="glass-card-elevated p-3.5 rounded-2xl animate-slide-up" style={{ animationDelay: '0.15s' }}>
+          <div className="w-9 h-9 rounded-xl bg-destructive/10 flex items-center justify-center mb-2.5">
+            <TrendingDown className="w-4.5 h-4.5 text-destructive" />
           </div>
-          <p className="text-[10px] text-muted-foreground">Total Debo</p>
-          <p className="text-sm font-bold text-foreground">{formatTaka(totalJoma)}</p>
+          <p className="text-[10px] text-muted-foreground font-medium">Total Debo</p>
+          <p className="text-sm font-bold text-foreground mt-0.5">{formatTaka(totalJoma)}</p>
         </div>
-        <div className="p-3 rounded-xl bg-card border border-border">
-          <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center mb-2">
-            <Banknote className="w-4 h-4 text-success" />
+        <div className="glass-card-elevated p-3.5 rounded-2xl animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div className="w-9 h-9 rounded-xl bg-success/10 flex items-center justify-center mb-2.5">
+            <Banknote className="w-4.5 h-4.5 text-success" />
           </div>
-          <p className="text-[10px] text-muted-foreground">Cash</p>
-          <p className="text-sm font-bold text-foreground">
-            {formatTaka(data.accounts.find(a => a.id === 'cash')?.balance || 0)}
-          </p>
+          <p className="text-[10px] text-muted-foreground font-medium">Cash</p>
+          <p className="text-sm font-bold text-foreground mt-0.5">{formatTaka(cashBalance)}</p>
         </div>
       </div>
 
       {/* Account Balances */}
-      <div className="mx-4">
-        <h2 className="text-sm font-semibold text-foreground mb-3">Account Balances</h2>
-        <div className="grid gap-2">
-          {data.accounts.map(acc => {
+      <div className="mx-4 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-foreground">My Accounts</h2>
+          <Link to="/accounts" className="text-xs font-medium text-primary hover:underline">View All</Link>
+        </div>
+        
+        {/* Horizontal scroll accounts */}
+        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+          {data.accounts.map((acc, i) => {
             const Icon = iconMap[acc.icon] || WalletIcon;
-            const gradient = categoryColors[acc.category] || 'from-gray-500 to-gray-600';
+            const gradient = categoryGradients[acc.category] || 'from-gray-500 to-gray-600';
             return (
-              <div key={acc.id} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
-                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-                  <Icon className="w-5 h-5 text-primary-foreground" />
+              <div key={acc.id} className="min-w-[140px] glass-card-elevated p-4 rounded-2xl shrink-0 animate-scale-in" style={{ animationDelay: `${i * 0.05}s` }}>
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-3 shadow-sm`}>
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+                <p className="text-xs text-muted-foreground font-medium truncate">{acc.name}</p>
+                <p className="text-sm font-bold text-foreground mt-0.5">{formatTaka(acc.balance)}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Recent Transactions */}
+      <div className="mx-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-bold text-foreground">Recent Transactions</h2>
+          <Link to="/transactions" className="text-xs font-medium text-primary hover:underline">See All</Link>
+        </div>
+        <div className="space-y-2">
+          {recentTxs.length === 0 && (
+            <p className="text-center text-sm text-muted-foreground py-6">No transactions yet</p>
+          )}
+          {recentTxs.map((tx, i) => {
+            const acc = data.accounts.find(a => a.id === tx.accountId);
+            const isIncome = tx.type === 'income';
+            const isExpense = tx.type === 'expense';
+            return (
+              <div key={tx.id} className="flex items-center gap-3 p-3.5 rounded-2xl glass-card animate-slide-up" style={{ animationDelay: `${i * 0.06}s` }}>
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${isIncome ? 'bg-success/10' : isExpense ? 'bg-destructive/10' : 'bg-muted'}`}>
+                  {isIncome ? <ArrowDownLeft className="w-5 h-5 text-success" /> : isExpense ? <ArrowUpRight className="w-5 h-5 text-destructive" /> : <Banknote className="w-5 h-5 text-muted-foreground" />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{acc.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{acc.category}</p>
+                  <p className="text-sm font-semibold text-foreground truncate">{tx.name}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{acc?.name || tx.type} • {tx.date}</p>
                 </div>
-                <p className="text-sm font-bold text-foreground">{formatTaka(acc.balance)}</p>
+                <p className={`text-sm font-bold ${isIncome ? 'text-success' : isExpense ? 'text-destructive' : 'text-foreground'}`}>
+                  {isIncome ? '+' : isExpense ? '-' : ''}{formatTaka(tx.amount)}
+                </p>
               </div>
             );
           })}
