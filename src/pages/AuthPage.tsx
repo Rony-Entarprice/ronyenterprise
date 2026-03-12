@@ -1,23 +1,36 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Wallet, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
 export default function AuthPage() {
-  const { signIn, signUp } = useAuth();
+  const { user, loading: authLoading, signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [showPw, setShowPw] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center animate-pulse">
+          <span className="text-white text-lg font-bold">R</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (user) return <Navigate to="/" replace />;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(''); setSuccess(''); setLoading(true);
+    setError(''); setSuccess(''); setSubmitting(true);
 
     if (isLogin) {
       const { error } = await signIn(email, password);
@@ -25,14 +38,13 @@ export default function AuthPage() {
     } else {
       const { error } = await signUp(email, password, name);
       if (error) setError(error.message);
-      else setSuccess('Account created! Check your email to verify.');
+      else setSuccess('Account created! You can now sign in.');
     }
-    setLoading(false);
+    setSubmitting(false);
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
-      {/* Logo */}
       <div className="mb-8 text-center animate-fade-in">
         <div className="w-16 h-16 rounded-2xl gradient-card-blue flex items-center justify-center mx-auto mb-4">
           <Wallet className="w-8 h-8 text-white" />
@@ -41,7 +53,6 @@ export default function AuthPage() {
         <p className="text-sm text-muted-foreground mt-1">Business Ledger</p>
       </div>
 
-      {/* Form Card */}
       <div className="w-full max-w-sm glass-card-elevated rounded-3xl p-6 animate-slide-up">
         <h2 className="text-lg font-bold text-foreground mb-1">
           {isLogin ? 'Welcome Back' : 'Create Account'}
@@ -79,8 +90,8 @@ export default function AuthPage() {
           {error && <p className="text-xs text-destructive font-medium">{error}</p>}
           {success && <p className="text-xs text-success font-medium">{success}</p>}
 
-          <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl gradient-primary text-white border-0 font-semibold text-base">
-            {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
+          <Button type="submit" disabled={submitting} className="w-full h-12 rounded-xl gradient-primary text-white border-0 font-semibold text-base">
+            {submitting ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
           </Button>
         </form>
 
