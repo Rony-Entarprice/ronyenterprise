@@ -1,10 +1,24 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Wallet, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 
 export default function AuthPage() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center animate-pulse">
+          <span className="text-white text-lg font-bold">R</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (user) return <Navigate to="/" replace />;
   const { signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
