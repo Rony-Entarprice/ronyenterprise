@@ -13,6 +13,7 @@ import BakiPage from "./pages/BakiPage";
 import TransactionsPage from "./pages/TransactionsPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
+import DailyBalancePage from "./pages/DailyBalancePage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 
@@ -46,6 +47,7 @@ function ProtectedRoutes() {
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/daily-balance" element={<DailyBalancePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <AddTransactionFAB />

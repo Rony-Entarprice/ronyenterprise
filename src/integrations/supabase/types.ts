@@ -129,6 +129,48 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_balance_snapshots: {
+        Row: {
+          account_id: string
+          balance: number
+          business_id: string
+          created_at: string
+          id: string
+          snapshot_date: string
+        }
+        Insert: {
+          account_id: string
+          balance?: number
+          business_id: string
+          created_at?: string
+          id?: string
+          snapshot_date?: string
+        }
+        Update: {
+          account_id?: string
+          balance?: number
+          business_id?: string
+          created_at?: string
+          id?: string
+          snapshot_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_balance_snapshots_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_balance_snapshots_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       joma_debo: {
         Row: {
           amount: number
