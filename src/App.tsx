@@ -47,6 +47,7 @@ function ProtectedRoutes() {
           <Route path="/transactions" element={<TransactionsPage />} />
           <Route path="/reports" element={<ReportsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/daily-balance" element={<DailyBalancePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <AddTransactionFAB />

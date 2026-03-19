@@ -85,6 +85,22 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Daily Balance Button */}
+      <div className="mx-4 mb-4">
+        <Link to="/daily-balance" className="glass-card-elevated rounded-2xl p-4 flex items-center justify-between hover:bg-accent/50 transition-colors block">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+              <Banknote className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-foreground">আজকের ব্যালেন্স আপডেট</p>
+              <p className="text-[10px] text-muted-foreground">প্রতিদিনের অ্যাকাউন্ট ব্যালেন্স সেভ করুন</p>
+            </div>
+          </div>
+          <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+        </Link>
+      </div>
+
       {/* Quick Stats Row */}
       <div className="grid grid-cols-3 gap-3 mx-4 mb-6">
         <div className="glass-card-elevated p-3.5 rounded-2xl animate-slide-up" style={{ animationDelay: '0.1s' }}>
