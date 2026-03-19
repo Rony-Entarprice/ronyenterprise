@@ -13,6 +13,7 @@ import BakiPage from "./pages/BakiPage";
 import TransactionsPage from "./pages/TransactionsPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
+import DailyBalancePage from "./pages/DailyBalancePage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 
